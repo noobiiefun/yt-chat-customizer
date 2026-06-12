@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YT Chat CSS Customizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-header-left">
+    <i class="ti ti-brand-youtube" style="font-size:22px;color:#ff4444"></i>
+    <div>
+      <h1>YT Chat CSS Customizer</h1>
+      <p>Buat overlay live chat YouTube untuk OBS &amp; StreamElements</p>
+    </div>
+  </div>
+  <div class="app-header-right">
+    <a href="https://github.com" target="_blank" class="btn-ghost">
+      <i class="ti ti-brand-github"></i> GitHub
+    </a>
+  </div>
+</header>
+
+<main class="app-main">
+
+  <!-- PANEL KIRI: CONTROLS -->
+  <aside class="panel-left">
+    <div class="tabs">
+      <button class="tab active" data-tab="themes">
+        <i class="ti ti-palette"></i> Tema
+      </button>
+      <button class="tab" data-tab="colors">
+        <i class="ti ti-color-swatch"></i> Warna
+      </button>
+      <button class="tab" data-tab="style">
+        <i class="ti ti-typography"></i> Style
+      </button>
+      <button class="tab" data-tab="anim">
+        <i class="ti ti-sparkles"></i> Animasi
+      </button>
+    </div>
+
+    <!-- TAB: TEMA -->
+    <div id="tab-themes" class="tab-content active">
+      <div class="section-label">Preset Tema</div>
+      <div class="theme-grid">
+        <button class="theme-btn active" data-theme="vtuber">
+          <span class="theme-icon">🌸</span>
+          <span>VTuber Pastel</span>
+        </button>
+        <button class="theme-btn" data-theme="neon">
+          <span class="theme-icon">⚡</span>
+          <span>Neon Cyberpunk</span>
+        </button>
+        <button class="theme-btn" data-theme="minimal">
+          <span class="theme-icon">◻</span>
+          <span>Clean Minimal</span>
+        </button>
+        <button class="theme-btn" data-theme="retro">
+          <span class="theme-icon">👾</span>
+          <span>Retro Pixel</span>
+        </button>
+        <button class="theme-btn" data-theme="ocean">
+          <span class="theme-icon">🌊</span>
+          <span>Ocean Dark</span>
+        </button>
+        <button class="theme-btn" data-theme="sakura">
+          <span class="theme-icon">🌺</span>
+          <span>Sakura Pink</span>
+        </button>
+      </div>
+      <div class="section-label" style="margin-top:20px">Tentang</div>
+      <p class="hint-text">
+        Pilih tema preset lalu kustomisasi di tab Warna &amp; Style.<br><br>
+        Hasil CSS bisa langsung di-copy dan paste ke:<br>
+        • <strong>OBS Browser Source</strong> → Custom CSS<br>
+        • <strong>StreamElements</strong> → Chat Widget CSS
+      </p>
+    </div>
+
+    <!-- TAB: WARNA -->
+    <div id="tab-colors" class="tab-content">
+      <div class="section-label">Bubble Pesan</div>
+      <div class="color-row">
+        <div class="field">
+          <label>Background pesan</label>
+          <input type="color" id="c-msg-bg" value="#1e1032">
+        </div>
+        <div class="field">
+          <label>Border kiri</label>
+          <input type="color" id="c-border" value="#a855f7">
+        </div>
+      </div>
+
+      <div class="section-label">Teks</div>
+      <div class="color-row">
+        <div class="field">
+          <label>Nama viewer</label>
+          <input type="color" id="c-name" value="#e879f9">
+        </div>
+        <div class="field">
+          <label>Isi pesan</label>
+          <input type="color" id="c-text" value="#f0e6ff">
+        </div>
+      </div>
+
+      <div class="section-label">Warna Nama per Role</div>
+      <div class="color-row">
+        <div class="field">
+          <label>Moderator</label>
+          <input type="color" id="c-mod" value="#34d399">
+        </div>
+        <div class="field">
+          <label>Owner</label>
+          <input type="color" id="c-owner" value="#fbbf24">
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="field">
+          <label>Subscriber</label>
+          <input type="color" id="c-sub" value="#f472b6">
+        </div>
+        <div class="field">
+          <label>Verified</label>
+          <input type="color" id="c-verified" value="#60a5fa">
+        </div>
+      </div>
+
+      <div class="section-label">Badge</div>
+      <div class="color-row">
+        <div class="field">
+          <label>Badge background</label>
+          <input type="color" id="c-badge-bg" value="#a855f7">
+        </div>
+        <div class="field">
+          <label>Badge teks</label>
+          <input type="color" id="c-badge-fg" value="#ffffff">
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: STYLE -->
+    <div id="tab-style" class="tab-content">
+      <div class="section-label">Tipografi</div>
+      <div class="field">
+        <label>Font keluarga</label>
+        <select id="sel-font">
+          <option value="Inter">Inter</option>
+          <option value="Nunito" selected>Nunito (kawaii)</option>
+          <option value="JetBrains Mono">JetBrains Mono</option>
+          <option value="Press Start 2P">Press Start 2P (retro)</option>
+          <option value="Noto Sans JP">Noto Sans JP</option>
+          <option value="Poppins">Poppins</option>
+          <option value="Fredoka One">Fredoka One</option>
+          <option value="Comic Neue">Comic Neue</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ukuran font <span class="val-label" id="lbl-size">14px</span></label>
+        <input type="range" id="rng-size" min="11" max="20" value="14" step="1">
+      </div>
+
+      <div class="section-label">Bubble</div>
+      <div class="field">
+        <label>Border radius <span class="val-label" id="lbl-rad">16px</span></label>
+        <input type="range" id="rng-rad" min="0" max="28" value="16" step="1">
+      </div>
+      <div class="field">
+        <label>Ketebalan border kiri <span class="val-label" id="lbl-bw">3px</span></label>
+        <input type="range" id="rng-bw" min="0" max="8" value="3" step="1">
+      </div>
+
+      <div class="section-label">Layout</div>
+      <div class="field">
+        <label>Ukuran avatar <span class="val-label" id="lbl-av">32px</span></label>
+        <input type="range" id="rng-av" min="0" max="48" value="32" step="4">
+      </div>
+      <div class="field">
+        <label>Jarak antar pesan <span class="val-label" id="lbl-gap">10px</span></label>
+        <input type="range" id="rng-gap" min="2" max="24" value="10" step="1">
+      </div>
+      <div class="field">
+        <label>Padding bubble <span class="val-label" id="lbl-pad">8px 12px</span></label>
+        <input type="range" id="rng-pad" min="4" max="20" value="8" step="2">
+      </div>
+
+      <div class="section-label">Opacity</div>
+      <div class="field">
+        <label>Transparansi bubble <span class="val-label" id="lbl-opa">100%</span></label>
+        <input type="range" id="rng-opa" min="0" max="100" value="100" step="5">
+      </div>
+    </div>
+
+    <!-- TAB: ANIMASI -->
+    <div id="tab-anim" class="tab-content">
+      <div class="section-label">Efek Masuk</div>
+      <div class="anim-grid">
+        <button class="anim-btn active" data-anim="slideIn">
+          <i class="ti ti-arrow-right"></i>
+          <span>Slide kanan</span>
+        </button>
+        <button class="anim-btn" data-anim="fadeIn">
+          <i class="ti ti-eye"></i>
+          <span>Fade in</span>
+        </button>
+        <button class="anim-btn" data-anim="popIn">
+          <i class="ti ti-star"></i>
+          <span>Pop in</span>
+        </button>
+        <button class="anim-btn" data-anim="bounceIn">
+          <i class="ti ti-arrow-up"></i>
+          <span>Bounce up</span>
+        </button>
+        <button class="anim-btn" data-anim="none">
+          <i class="ti ti-minus"></i>
+          <span>Tanpa animasi</span>
+        </button>
+      </div>
+
+      <div class="field" style="margin-top:16px">
+        <label>Kecepatan animasi <span class="val-label" id="lbl-aspd">350ms</span></label>
+        <input type="range" id="rng-aspd" min="100" max="800" value="350" step="50">
+      </div>
+
+      <div class="field" style="margin-top:16px">
+        <button class="btn-primary" id="btn-add-msg" style="width:100%">
+          <i class="ti ti-plus"></i> Tambah pesan test
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PANEL KANAN: PREVIEW -->
+  <section class="panel-right">
+    <div class="preview-header">
+      <span><i class="ti ti-eye" style="font-size:13px;margin-right:4px"></i>Live Preview</span>
+      <div class="preview-dots">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+      </div>
+    </div>
+
+    <div class="preview-area" id="preview-area">
+      <!-- Messages rendered by JS -->
+    </div>
+
+    <div class="copy-bar">
+      <button class="btn-copy-css" id="btn-copy-css">
+        <i class="ti ti-copy"></i> Copy CSS (OBS)
+      </button>
+      <button class="btn-copy-se" id="btn-copy-se">
+        <i class="ti ti-brand-javascript"></i> Copy CSS (StreamElements)
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<div id="toast"></div>
+
+<script src="themes.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
