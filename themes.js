@@ -1,6 +1,19 @@
 // themes.js — Preset tema YT Chat CSS Customizer v2
 
 const THEMES = {
+  streambox: {
+    name: 'Stream Box', vars: {
+      '--chat-msg-bg':'#111118','--chat-border-color':'#3b82f6','--chat-border-width':'4px',
+      '--chat-name-color':'#ffffff','--chat-text-color':'#d1d5db',
+      '--chat-badge-bg':'#3b82f6','--chat-badge-color':'#fff',
+      '--chat-msg-radius':'4px','--chat-gap':'8px','--chat-font-size':'13px',
+      '--chat-avatar-size':'32px','--chat-padding-v':'8px','--chat-padding-h':'12px','--chat-bubble-opacity':'1',
+      '--chat-mod-name':'#ffffff','--chat-mod-border':'#3b82f6',
+      '--chat-owner-name':'#ffffff','--chat-owner-border':'#f59e0b',
+      '--chat-sub-name':'#ffffff','--chat-sub-border':'#22c55e',
+      '--chat-verified-name':'#ffffff','--chat-verified-border':'#a78bfa',
+    }, font:'Inter', anim:'slideIn', animSpeed:280,
+  },
   vtuber: {
     name: 'VTuber Pastel', vars: {
       '--chat-msg-bg':'#1e1032','--chat-border-color':'#a855f7','--chat-border-width':'3px',
@@ -82,13 +95,12 @@ const THEMES = {
 };
 
 const SAMPLE_MESSAGES = [
-  { type:'owner',    name:'ChannelOwner',    text:'Halo semua! Selamat datang di stream! 💜',          badge:'Owner',   avatarColor:'#f59e0b', initials:'CO' },
-  { type:'mod',      name:'ModeratorKu',     text:'Dilarang spam ya! Enjoy the stream 🛡️',             badge:'Mod',     avatarColor:'#10b981', initials:'MK' },
-  { type:'normal',   name:'ViewerBiasa123',  text:'Halo kak! udah nonton dari awal nih',               badge:null,      avatarColor:'#7c3aed', initials:'VB' },
-  { type:'sub',      name:'SubriberSetia',   text:'Bulan ke-3 sub! terus semangat kak 🔥',             badge:'Member',  avatarColor:'#ec4899', initials:'SS' },
-  { type:'verified', name:'CreatorLain ✓',   text:'Kontennya bagus banget, keep it up!',               badge:null,      avatarColor:'#3b82f6', initials:'CL' },
-  { type:'normal',   name:'GuestViewer99',   text:'game apa nih? keliatan seru banget wkwk',           badge:null,      avatarColor:'#06b6d4', initials:'GV' },
-  { type:'normal',   name:'XiaoMeiLing',     text:'こんにちは！日本から見てます！',                    badge:null,      avatarColor:'#8b5cf6', initials:'XM' },
+  { type:'normal',   name:'Dek Reza',                       text:'Emote 🐱🎮',                                         badge:null,      avatarColor:'#6366f1', initials:'DR' },
+  { type:'sub',      name:'Membership Viewer',               text:'Ini Pesan Dari MemberShip',                          badge:'Member',  avatarColor:'#22c55e', initials:'MV' },
+  { type:'normal',   name:'Viewer Biasa',                    text:'Iya',                                                badge:null,      avatarColor:'#64748b', initials:'VB' },
+  { type:'owner',    name:'Nama owner yang sangat panjang euy', text:'Reza sukanya oneesan kak 🐱🎮',                   badge:'Owner',   avatarColor:'#f59e0b', initials:'NO' },
+  { type:'mod',      name:'Mas Reza',                        text:'Y',                                                  badge:'Mod',     avatarColor:'#3b82f6', initials:'MR' },
+  { type:'normal',   name:'GuestViewer99',                   text:'game apa nih? keliatan seru banget wkwk',            badge:null,      avatarColor:'#06b6d4', initials:'GV' },
 ];
 
 const EXTRA_MESSAGES = [
