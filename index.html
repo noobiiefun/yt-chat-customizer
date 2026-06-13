@@ -16,10 +16,17 @@
     <i class="ti ti-brand-youtube" style="font-size:22px;color:#ff4444"></i>
     <div>
       <h1>YT Chat CSS Customizer</h1>
-      <p>Buat overlay live chat YouTube untuk OBS &amp; StreamElements</p>
+      <p>Overlay live chat YouTube untuk OBS &amp; StreamElements</p>
     </div>
   </div>
   <div class="app-header-right">
+    <button class="btn-ghost" id="btn-export-preset" title="Export preset ke file JSON">
+      <i class="ti ti-download"></i> Export
+    </button>
+    <label class="btn-ghost" title="Import preset dari file JSON" style="cursor:pointer">
+      <i class="ti ti-upload"></i> Import
+      <input type="file" id="inp-import" accept=".json" style="display:none">
+    </label>
     <a href="https://github.com" target="_blank" class="btn-ghost">
       <i class="ti ti-brand-github"></i> GitHub
     </a>
@@ -28,118 +35,141 @@
 
 <main class="app-main">
 
-  <!-- PANEL KIRI: CONTROLS -->
+  <!-- PANEL KIRI -->
   <aside class="panel-left">
     <div class="tabs">
-      <button class="tab active" data-tab="themes">
-        <i class="ti ti-palette"></i> Tema
-      </button>
-      <button class="tab" data-tab="colors">
-        <i class="ti ti-color-swatch"></i> Warna
-      </button>
-      <button class="tab" data-tab="style">
-        <i class="ti ti-typography"></i> Style
-      </button>
-      <button class="tab" data-tab="anim">
-        <i class="ti ti-sparkles"></i> Animasi
-      </button>
+      <button class="tab active" data-tab="themes"><i class="ti ti-palette"></i> Tema</button>
+      <button class="tab" data-tab="colors"><i class="ti ti-color-swatch"></i> Warna</button>
+      <button class="tab" data-tab="roles"><i class="ti ti-users"></i> Role</button>
+      <button class="tab" data-tab="style"><i class="ti ti-typography"></i> Style</button>
+      <button class="tab" data-tab="anim"><i class="ti ti-sparkles"></i> Animasi</button>
     </div>
 
     <!-- TAB: TEMA -->
     <div id="tab-themes" class="tab-content active">
       <div class="section-label">Preset Tema</div>
       <div class="theme-grid">
-        <button class="theme-btn active" data-theme="vtuber">
-          <span class="theme-icon">🌸</span>
-          <span>VTuber Pastel</span>
+        <button class="theme-btn active" data-theme="vtuber"><span class="theme-icon">🌸</span><span>VTuber Pastel</span></button>
+        <button class="theme-btn" data-theme="neon"><span class="theme-icon">⚡</span><span>Neon Cyberpunk</span></button>
+        <button class="theme-btn" data-theme="minimal"><span class="theme-icon">◻</span><span>Clean Minimal</span></button>
+        <button class="theme-btn" data-theme="retro"><span class="theme-icon">👾</span><span>Retro Pixel</span></button>
+        <button class="theme-btn" data-theme="ocean"><span class="theme-icon">🌊</span><span>Ocean Dark</span></button>
+        <button class="theme-btn" data-theme="sakura"><span class="theme-icon">🌺</span><span>Sakura Pink</span></button>
+      </div>
+
+      <div class="section-label" style="margin-top:18px">Mode Transparansi</div>
+      <div class="transparency-toggle">
+        <button class="trans-btn active" id="btn-trans-normal" onclick="setTransparencyMode('normal',this)">
+          <i class="ti ti-square-filled"></i>
+          <span>Normal</span>
+          <small>Bubble berisi warna</small>
         </button>
-        <button class="theme-btn" data-theme="neon">
-          <span class="theme-icon">⚡</span>
-          <span>Neon Cyberpunk</span>
+        <button class="trans-btn" id="btn-trans-semi" onclick="setTransparencyMode('semi',this)">
+          <i class="ti ti-square-half"></i>
+          <span>Semi Transparan</span>
+          <small>Bubble sedikit tembus</small>
         </button>
-        <button class="theme-btn" data-theme="minimal">
-          <span class="theme-icon">◻</span>
-          <span>Clean Minimal</span>
-        </button>
-        <button class="theme-btn" data-theme="retro">
-          <span class="theme-icon">👾</span>
-          <span>Retro Pixel</span>
-        </button>
-        <button class="theme-btn" data-theme="ocean">
-          <span class="theme-icon">🌊</span>
-          <span>Ocean Dark</span>
-        </button>
-        <button class="theme-btn" data-theme="sakura">
-          <span class="theme-icon">🌺</span>
-          <span>Sakura Pink</span>
+        <button class="trans-btn" id="btn-trans-full" onclick="setTransparencyMode('full',this)">
+          <i class="ti ti-square"></i>
+          <span>Transparan Penuh</span>
+          <small>Hanya teks & border</small>
         </button>
       </div>
-      <div class="section-label" style="margin-top:20px">Tentang</div>
-      <p class="hint-text">
-        Pilih tema preset lalu kustomisasi di tab Warna &amp; Style.<br><br>
-        Hasil CSS bisa langsung di-copy dan paste ke:<br>
-        • <strong>OBS Browser Source</strong> → Custom CSS<br>
-        • <strong>StreamElements</strong> → Chat Widget CSS
-      </p>
+
+      <div class="section-label" style="margin-top:18px">Preset Tersimpan</div>
+      <div id="saved-presets-list">
+        <p class="hint-text" id="no-presets-hint">Belum ada preset tersimpan.<br>Kustomisasi lalu klik <strong>Simpan Preset</strong>.</p>
+      </div>
+      <button class="btn-primary" id="btn-save-preset" style="width:100%;margin-top:10px">
+        <i class="ti ti-device-floppy"></i> Simpan Preset Sekarang
+      </button>
     </div>
 
     <!-- TAB: WARNA -->
     <div id="tab-colors" class="tab-content">
       <div class="section-label">Bubble Pesan</div>
       <div class="color-row">
-        <div class="field">
-          <label>Background pesan</label>
-          <input type="color" id="c-msg-bg" value="#1e1032">
-        </div>
-        <div class="field">
-          <label>Border kiri</label>
-          <input type="color" id="c-border" value="#a855f7">
-        </div>
+        <div class="field"><label>Background pesan</label><input type="color" id="c-msg-bg" value="#1e1032"></div>
+        <div class="field"><label>Border kiri</label><input type="color" id="c-border" value="#a855f7"></div>
       </div>
-
       <div class="section-label">Teks</div>
       <div class="color-row">
-        <div class="field">
-          <label>Nama viewer</label>
-          <input type="color" id="c-name" value="#e879f9">
+        <div class="field"><label>Nama viewer (default)</label><input type="color" id="c-name" value="#e879f9"></div>
+        <div class="field"><label>Isi pesan</label><input type="color" id="c-text" value="#f0e6ff"></div>
+      </div>
+      <div class="section-label">Badge Viewer</div>
+      <div class="color-row">
+        <div class="field"><label>Badge background</label><input type="color" id="c-badge-bg" value="#a855f7"></div>
+        <div class="field"><label>Badge teks</label><input type="color" id="c-badge-fg" value="#ffffff"></div>
+      </div>
+      <div class="section-label">Opacity Bubble</div>
+      <div class="field">
+        <label>Transparansi <span class="val-label" id="lbl-opa">100%</span></label>
+        <input type="range" id="rng-opa" min="0" max="100" value="100" step="5">
+      </div>
+    </div>
+
+    <!-- TAB: ROLE COLORS -->
+    <div id="tab-roles" class="tab-content">
+      <p class="hint-text" style="margin-bottom:14px">Atur warna nama dan highlight bubble untuk tiap role. Setiap role bisa punya warna unik.</p>
+
+      <div class="role-card" id="role-card-mod">
+        <div class="role-card-header">
+          <span class="role-dot" style="background:#34d399"></span>
+          <span class="role-title">Moderator</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="chk-role-mod" checked>
+            <span class="toggle-track"></span>
+          </label>
         </div>
-        <div class="field">
-          <label>Isi pesan</label>
-          <input type="color" id="c-text" value="#f0e6ff">
+        <div class="color-row role-colors">
+          <div class="field"><label>Warna nama</label><input type="color" id="c-mod" value="#34d399"></div>
+          <div class="field"><label>Border bubble</label><input type="color" id="c-mod-border" value="#34d399"></div>
         </div>
       </div>
 
-      <div class="section-label">Warna Nama per Role</div>
-      <div class="color-row">
-        <div class="field">
-          <label>Moderator</label>
-          <input type="color" id="c-mod" value="#34d399">
+      <div class="role-card" id="role-card-owner">
+        <div class="role-card-header">
+          <span class="role-dot" style="background:#fbbf24"></span>
+          <span class="role-title">Owner / Broadcaster</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="chk-role-owner" checked>
+            <span class="toggle-track"></span>
+          </label>
         </div>
-        <div class="field">
-          <label>Owner</label>
-          <input type="color" id="c-owner" value="#fbbf24">
-        </div>
-      </div>
-      <div class="color-row">
-        <div class="field">
-          <label>Subscriber</label>
-          <input type="color" id="c-sub" value="#f472b6">
-        </div>
-        <div class="field">
-          <label>Verified</label>
-          <input type="color" id="c-verified" value="#60a5fa">
+        <div class="color-row role-colors">
+          <div class="field"><label>Warna nama</label><input type="color" id="c-owner" value="#fbbf24"></div>
+          <div class="field"><label>Border bubble</label><input type="color" id="c-owner-border" value="#fbbf24"></div>
         </div>
       </div>
 
-      <div class="section-label">Badge</div>
-      <div class="color-row">
-        <div class="field">
-          <label>Badge background</label>
-          <input type="color" id="c-badge-bg" value="#a855f7">
+      <div class="role-card" id="role-card-sub">
+        <div class="role-card-header">
+          <span class="role-dot" style="background:#f472b6"></span>
+          <span class="role-title">Subscriber / Member</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="chk-role-sub" checked>
+            <span class="toggle-track"></span>
+          </label>
         </div>
-        <div class="field">
-          <label>Badge teks</label>
-          <input type="color" id="c-badge-fg" value="#ffffff">
+        <div class="color-row role-colors">
+          <div class="field"><label>Warna nama</label><input type="color" id="c-sub" value="#f472b6"></div>
+          <div class="field"><label>Border bubble</label><input type="color" id="c-sub-border" value="#f472b6"></div>
+        </div>
+      </div>
+
+      <div class="role-card" id="role-card-verified">
+        <div class="role-card-header">
+          <span class="role-dot" style="background:#60a5fa"></span>
+          <span class="role-title">Verified Creator</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="chk-role-verified" checked>
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="color-row role-colors">
+          <div class="field"><label>Warna nama</label><input type="color" id="c-verified" value="#60a5fa"></div>
+          <div class="field"><label>Border bubble</label><input type="color" id="c-verified-border" value="#60a5fa"></div>
         </div>
       </div>
     </div>
@@ -164,7 +194,6 @@
         <label>Ukuran font <span class="val-label" id="lbl-size">14px</span></label>
         <input type="range" id="rng-size" min="11" max="20" value="14" step="1">
       </div>
-
       <div class="section-label">Bubble</div>
       <div class="field">
         <label>Border radius <span class="val-label" id="lbl-rad">16px</span></label>
@@ -174,7 +203,6 @@
         <label>Ketebalan border kiri <span class="val-label" id="lbl-bw">3px</span></label>
         <input type="range" id="rng-bw" min="0" max="8" value="3" step="1">
       </div>
-
       <div class="section-label">Layout</div>
       <div class="field">
         <label>Ukuran avatar <span class="val-label" id="lbl-av">32px</span></label>
@@ -188,46 +216,23 @@
         <label>Padding bubble <span class="val-label" id="lbl-pad">8px 12px</span></label>
         <input type="range" id="rng-pad" min="4" max="20" value="8" step="2">
       </div>
-
-      <div class="section-label">Opacity</div>
-      <div class="field">
-        <label>Transparansi bubble <span class="val-label" id="lbl-opa">100%</span></label>
-        <input type="range" id="rng-opa" min="0" max="100" value="100" step="5">
-      </div>
     </div>
 
     <!-- TAB: ANIMASI -->
     <div id="tab-anim" class="tab-content">
       <div class="section-label">Efek Masuk</div>
       <div class="anim-grid">
-        <button class="anim-btn active" data-anim="slideIn">
-          <i class="ti ti-arrow-right"></i>
-          <span>Slide kanan</span>
-        </button>
-        <button class="anim-btn" data-anim="fadeIn">
-          <i class="ti ti-eye"></i>
-          <span>Fade in</span>
-        </button>
-        <button class="anim-btn" data-anim="popIn">
-          <i class="ti ti-star"></i>
-          <span>Pop in</span>
-        </button>
-        <button class="anim-btn" data-anim="bounceIn">
-          <i class="ti ti-arrow-up"></i>
-          <span>Bounce up</span>
-        </button>
-        <button class="anim-btn" data-anim="none">
-          <i class="ti ti-minus"></i>
-          <span>Tanpa animasi</span>
-        </button>
+        <button class="anim-btn" data-anim="slideIn"><i class="ti ti-arrow-right"></i><span>Slide</span></button>
+        <button class="anim-btn" data-anim="fadeIn"><i class="ti ti-eye"></i><span>Fade</span></button>
+        <button class="anim-btn" data-anim="popIn"><i class="ti ti-star"></i><span>Pop</span></button>
+        <button class="anim-btn" data-anim="bounceIn"><i class="ti ti-arrow-up"></i><span>Bounce</span></button>
+        <button class="anim-btn" data-anim="none"><i class="ti ti-minus"></i><span>Tanpa</span></button>
       </div>
-
       <div class="field" style="margin-top:16px">
-        <label>Kecepatan animasi <span class="val-label" id="lbl-aspd">350ms</span></label>
-        <input type="range" id="rng-aspd" min="100" max="800" value="350" step="50">
+        <label>Kecepatan <span class="val-label" id="lbl-aspd">400ms</span></label>
+        <input type="range" id="rng-aspd" min="100" max="800" value="400" step="50">
       </div>
-
-      <div class="field" style="margin-top:16px">
+      <div class="field" style="margin-top:12px">
         <button class="btn-primary" id="btn-add-msg" style="width:100%">
           <i class="ti ti-plus"></i> Tambah pesan test
         </button>
@@ -239,28 +244,48 @@
   <section class="panel-right">
     <div class="preview-header">
       <span><i class="ti ti-eye" style="font-size:13px;margin-right:4px"></i>Live Preview</span>
-      <div class="preview-dots">
-        <div class="dot red"></div>
-        <div class="dot yellow"></div>
-        <div class="dot green"></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="preview-bg-label" id="preview-bg-label">bg: gelap</span>
+        <button class="btn-toggle-bg" id="btn-toggle-bg" title="Ganti background preview">
+          <i class="ti ti-exchange"></i>
+        </button>
+        <div class="preview-dots">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        </div>
       </div>
     </div>
-
-    <div class="preview-area" id="preview-area">
-      <!-- Messages rendered by JS -->
-    </div>
-
+    <div class="preview-area" id="preview-area"></div>
     <div class="copy-bar">
-      <button class="btn-copy-css" id="btn-copy-css">
-        <i class="ti ti-copy"></i> Copy CSS (OBS)
-      </button>
-      <button class="btn-copy-se" id="btn-copy-se">
-        <i class="ti ti-brand-javascript"></i> Copy CSS (StreamElements)
-      </button>
+      <button class="btn-copy-css" id="btn-copy-css"><i class="ti ti-copy"></i> Copy CSS (OBS)</button>
+      <button class="btn-copy-se" id="btn-copy-se"><i class="ti ti-brand-javascript"></i> Copy CSS (SE)</button>
     </div>
   </section>
 
 </main>
+
+<!-- MODAL SIMPAN PRESET -->
+<div id="modal-save" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span>Simpan Preset</span>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Nama preset</label>
+        <input type="text" id="inp-preset-name" placeholder="Contoh: Tema Stream Sabtu Malam" maxlength="40">
+      </div>
+      <div class="field">
+        <label>Emoji ikon (opsional)</label>
+        <input type="text" id="inp-preset-icon" placeholder="🎨" maxlength="2" style="width:60px">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal()">Batal</button>
+      <button class="btn-primary" onclick="confirmSavePreset()"><i class="ti ti-device-floppy"></i> Simpan</button>
+    </div>
+  </div>
+</div>
 
 <div id="toast"></div>
 
