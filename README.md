@@ -56,6 +56,9 @@ Tidak butuh Node.js, npm, atau server apapun. Cukup buka `index.html` di browser
    ```
 4. Centang **"Custom CSS"**, paste CSS yang sudah disalin
 5. Set width ~400px, height ~600px (sesuaikan)
+6. **Penting:** setiap kali mengubah setting di app, klik ulang **Copy CSS (OBS)**
+   lalu paste kembali ke Custom CSS dan tekan OK/Refresh agar OBS memuat versi terbaru
+   (CSS-nya statis — tidak berubah otomatis setelah di-paste).
 
 ---
 
