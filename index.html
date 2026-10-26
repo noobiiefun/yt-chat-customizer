@@ -233,6 +233,18 @@
         <label>Kecepatan <span class="val-label" id="lbl-aspd">400ms</span></label>
         <input type="range" id="rng-aspd" min="100" max="800" value="400" step="50">
       </div>
+
+      <div class="section-label" style="margin-top:18px">Waktu Pesan Menghilang</div>
+      <div class="anim-grid disappear-grid">
+        <button class="disp-btn active" data-disappear="0"><i class="ti ti-infinity"></i><span>Abadi</span></button>
+        <button class="disp-btn" data-disappear="3"><i class="ti ti-3"></i><span>3 dtk</span></button>
+        <button class="disp-btn" data-disappear="5"><i class="ti ti-5"></i><span>5 dtk</span></button>
+        <button class="disp-btn" data-disappear="10"><i class="ti ti-10"></i><span>10 dtk</span></button>
+        <button class="disp-btn" data-disappear="30"><i class="ti ti-clock"></i><span>30 dtk</span></button>
+        <button class="disp-btn" data-disappear="60"><i class="ti ti-hourglass"></i><span>1 mnt</span></button>
+      </div>
+      <p class="hint-text" style="margin-top:8px">Pesan pertama (paling atas) akan menghilang lebih dulu, lalu berikutnya secara berurutan.</p>
+
       <div class="field" style="margin-top:12px">
         <button class="btn-primary" id="btn-add-msg" style="width:100%">
           <i class="ti ti-plus"></i> Tambah pesan test

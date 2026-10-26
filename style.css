@@ -134,6 +134,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .anim-btn:hover { border-color: var(--accent-light); color: var(--text); }
 .anim-btn.active { border-color: var(--accent); background: #7c3aed22; color: var(--accent-light); }
 
+/* Tombol waktu pesan menghilang */
+.disappear-grid { grid-template-columns: repeat(3, 1fr); }
+.disp-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 4px; font-size: 10px; color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all .15s; }
+.disp-btn i { font-size: 15px; }
+.disp-btn:hover { border-color: var(--accent-light); color: var(--text); }
+.disp-btn.active { border-color: var(--accent); background: #7c3aed22; color: var(--accent-light); }
+
 /* ── BUTTONS ── */
 .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 14px; font-size: 12px; font-weight: 500; color: #fff; background: var(--accent); border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all .15s; }
 .btn-primary:hover { background: var(--accent-hover); }
@@ -171,6 +178,19 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .chat-msg.anim-fadeIn   { animation-name: fadeIn; animation-timing-function: ease; }
 .chat-msg.anim-popIn    { animation-name: popIn; }
 .chat-msg.anim-bounceIn { animation-name: bounceIn; }
+
+/* ── PESAN MENGHILANG (preview) ── */
+@keyframes msgCollapse {
+  from { max-height: 200px; opacity: 1; margin-bottom: var(--chat-gap); transform: scale(1); }
+  60%  { max-height: 200px; opacity: 0; margin-bottom: var(--chat-gap); transform: scale(.97); }
+  to   { max-height: 0; opacity: 0; margin-bottom: calc(-1 * var(--chat-gap)); padding: 0; transform: scale(.95); }
+}
+.chat-msg.msg-disappearing {
+  animation: msgCollapse .4s ease forwards !important;
+  animation-delay: 0s !important;
+  overflow: hidden;
+  pointer-events: none;
+}
 
 .chat-avatar { width: var(--chat-avatar-size); height: var(--chat-avatar-size); min-width: var(--chat-avatar-size); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
 .chat-bubble { background: var(--chat-msg-bg); border-radius: var(--chat-msg-radius); border-left: var(--chat-border-width) solid var(--chat-border-color); padding: var(--chat-padding-v) var(--chat-padding-h); opacity: var(--chat-bubble-opacity); flex: 1; min-width: 0; }

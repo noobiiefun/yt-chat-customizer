@@ -7,6 +7,7 @@ const state = {
   currentTheme: 'vtuber',
   currentAnim: 'popIn',
   animSpeed: 400,
+  disappearAfter: 0, // detik; 0 = abadi (pesan tidak menghilang)
   font: 'Nunito',
   transparencyMode: 'normal',
   previewBgIndex: 0,
@@ -220,6 +221,8 @@ function applyTheme(name) {
 
 // ── BUILD & RENDER MESSAGES ────────────────────────────────
 
+const DISAPPEAR_ANIM_MS = 400; // durasi animasi fade-out saat pesan menghilang
+
 function getRoleClass(type) {
   if (type === 'mod')      return state.roleEnabled.mod      ? 'chat-mod'      : 'chat-mod-off';
   if (type === 'owner')    return state.roleEnabled.owner    ? 'chat-owner'    : 'chat-owner-off';
@@ -242,6 +245,7 @@ function buildMessage(data, delayIndex = 0) {
   div.className = `chat-msg ${roleClass} ${animClass}`.replace(/\s+/g, ' ').trim();
   div.style.animationDelay    = delay + 'ms';
   div.style.animationDuration = state.animSpeed + 'ms';
+  div._createdAt = Date.now() + delay; // waktu pesan "muncul" (dipakai untuk hitung expire)
   div.innerHTML = `
     ${avatarHTML}
     <div class="chat-bubble">
@@ -251,11 +255,67 @@ function buildMessage(data, delayIndex = 0) {
   return div;
 }
 
+// ── PESAN MENGHILANG (auto-dismiss berurutan) ──────────────
+// Pesan paling lama (paling atas) menghilang lebih dulu, lalu
+// berikutnya secara berurutan sesuai waktu kemunculan masing-masing.
+
+let disappearTimer = null;
+
+function fadeOutAndRemove(el) {
+  if (!el || !el.parentNode || el._removing) return;
+  el._removing = true;
+  el.classList.add('msg-disappearing');
+  setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, DISAPPEAR_ANIM_MS);
+}
+
+function scheduleDisappearCheck() {
+  clearTimeout(disappearTimer);
+  if (!state.disappearAfter || state.disappearAfter <= 0) return; // 0 = abadi
+  const area = document.getElementById('preview-area');
+  if (!area) return;
+
+  const now     = Date.now();
+  const ttlMs   = state.disappearAfter * 1000;
+  let nextCheck = Infinity;
+
+  Array.from(area.children).forEach(child => {
+    if (!(child instanceof HTMLElement) || child._removing) return;
+    const bornAt = child._createdAt || now; // fallback: mulai dari sekarang
+    const expiresAt = bornAt + ttlMs;
+    if (expiresAt <= now) {
+      fadeOutAndRemove(child);
+    } else {
+      nextCheck = Math.min(nextCheck, expiresAt);
+    }
+  });
+
+  if (nextCheck !== Infinity) {
+    disappearTimer = setTimeout(scheduleDisappearCheck, nextCheck - Date.now() + 20);
+  }
+}
+
+function setDisappearTime(seconds, btn) {
+  state.disappearAfter = parseInt(seconds, 10) || 0;
+  document.querySelectorAll('.disp-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  // Jadwalkan ulang penghapusan tanpa perlu render ulang (pesan tetap di posisinya)
+  const area = document.getElementById('preview-area');
+  if (area) {
+    const now = Date.now();
+    Array.from(area.children).forEach(child => {
+      if (child instanceof HTMLElement && !child._createdAt) child._createdAt = now;
+    });
+  }
+  scheduleDisappearCheck();
+}
+
 function renderPreview() {
   const area = document.getElementById('preview-area');
+  clearTimeout(disappearTimer);
   area.innerHTML = '';
   SAMPLE_MESSAGES.forEach((msg, i) => area.appendChild(buildMessage(msg, i)));
   setTimeout(() => { area.scrollTop = area.scrollHeight; }, 700);
+  scheduleDisappearCheck();
 }
 
 // ── SNAPSHOT CURRENT STATE ─────────────────────────────────
@@ -278,6 +338,7 @@ function snapshotState() {
     font:             state.font,
     anim:             state.currentAnim,
     animSpeed:        state.animSpeed,
+    disappearAfter:   state.disappearAfter,
     transparencyMode: state.transparencyMode,
     roleEnabled:      { ...state.roleEnabled },
     vars,
@@ -292,6 +353,7 @@ function applySnapshot(snap) {
   state.font             = snap.font;
   state.currentAnim      = snap.anim;
   state.animSpeed        = snap.animSpeed;
+  state.disappearAfter   = parseInt(snap.disappearAfter, 10) || 0;
   state.transparencyMode = snap.transparencyMode || 'normal';
   if (snap.roleEnabled) Object.assign(state.roleEnabled, snap.roleEnabled);
 
@@ -349,6 +411,11 @@ function applySnapshot(snap) {
   document.querySelectorAll('.anim-btn').forEach(b => b.classList.remove('active'));
   const animBtn = document.querySelector(`[data-anim="${snap.anim}"]`);
   if (animBtn) animBtn.classList.add('active');
+
+  // Sync disappear buttons
+  document.querySelectorAll('.disp-btn').forEach(b => b.classList.remove('active'));
+  const dispBtn = document.querySelector(`[data-disappear="${state.disappearAfter}"]`);
+  if (dispBtn) dispBtn.classList.add('active');
 
   // Sync role checkboxes
   ['mod','owner','sub','verified'].forEach(role => {
@@ -550,6 +617,21 @@ function generateOBSCss() {
   //    karena YouTube memberi background internal yang menutupinya.
   // 2. Selector memakai "yt-live-chat-app" sebagai prefix tambahan supaya
   //    spesifikasitasnya menang melawan stylesheet bawaan YouTube.
+  const disappearMs = state.disappearAfter > 0 ? state.disappearAfter * 1000 : 0;
+  const disappearCss = disappearMs > 0 ? `
+/* ── Pesan menghilang otomatis (${state.disappearAfter} detik, berurutan dari pesan terlama) ── */
+yt-live-chat-app yt-live-chat-text-message-renderer {
+  animation: ${state.currentAnim === 'none' ? '' : `${state.currentAnim} ${state.animSpeed}ms cubic-bezier(.34,1.56,.64,1) both, `}chatAutoHide ${disappearMs + 400}ms linear ${disappearMs}ms forwards !important;
+  overflow: hidden !important;
+}
+
+@keyframes chatAutoHide {
+  0%        { max-height: 200px; opacity: 1; margin-bottom: ${gap}; }
+  98%       { max-height: 200px; opacity: 1; margin-bottom: ${gap}; }
+  99.5%     { max-height: 200px; opacity: 0; margin-bottom: ${gap}; }
+  100%      { max-height: 0; opacity: 0; margin-bottom: 0; padding-top: 0 !important; padding-bottom: 0 !important; }
+}` : '';
+
   return `/* =============================================
    YouTube Live Chat Overlay — OBS Browser Source
    Generated by YT Chat CSS Customizer v2
@@ -661,6 +743,7 @@ yt-live-chat-app yt-live-chat-text-message-renderer[author-type="verified"] #aut
 @keyframes popIn    { from { opacity:0; transform:scale(.88); } to { opacity:1; transform:scale(1); } }
 @keyframes bounceIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 ${animCss}
+${disappearCss}
 `;
 }
 
@@ -681,6 +764,20 @@ function generateSECss() {
   const subColor    = state.roleEnabled.sub      ? getVar('--chat-sub-name')      : nameColor;
   const animEntry   = state.currentAnim === 'none' ? 'none'
     : `${state.currentAnim} ${state.animSpeed}ms cubic-bezier(.34,1.56,.64,1) both`;
+  const disappearMsSE = state.disappearAfter > 0 ? state.disappearAfter * 1000 : 0;
+  const disappearCssSE = disappearMsSE > 0 ? `
+/* Pesan menghilang otomatis (${state.disappearAfter} detik, berurutan dari pesan terlama) */
+.message-row {
+  animation: ${state.currentAnim === 'none' ? '' : `${state.currentAnim} ${state.animSpeed}ms cubic-bezier(.34,1.56,.64,1) both, `}chatAutoHide ${disappearMsSE + 400}ms linear ${disappearMsSE}ms forwards !important;
+  overflow: hidden !important;
+}
+
+@keyframes chatAutoHide {
+  0%        { max-height: 200px; opacity: 1; margin-bottom: ${gap}; }
+  98%       { max-height: 200px; opacity: 1; margin-bottom: ${gap}; }
+  99.5%     { max-height: 200px; opacity: 0; margin-bottom: ${gap}; }
+  100%      { max-height: 0; opacity: 0; margin-bottom: 0; }
+}` : '';
 
   return `/* =============================================
    YouTube Live Chat — StreamElements CSS
@@ -733,6 +830,7 @@ body { background: transparent !important; overflow: hidden !important; }
 @keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
 @keyframes popIn    { from { opacity:0; transform:scale(.88); } to { opacity:1; transform:scale(1); } }
 @keyframes bounceIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+${disappearCssSE}
 `;
 }
 
@@ -765,6 +863,11 @@ document.querySelectorAll('.anim-btn').forEach(btn => {
     state.currentAnim = btn.dataset.anim;
     renderPreview();
   });
+});
+
+// Disappear-time buttons (waktu pesan menghilang)
+document.querySelectorAll('.disp-btn').forEach(btn => {
+  btn.addEventListener('click', () => setDisappearTime(btn.dataset.disappear, btn));
 });
 
 // Color inputs
@@ -844,6 +947,7 @@ document.getElementById('btn-add-msg').addEventListener('click', () => {
   const el   = buildMessage({ ...msg, name: msg.name + Math.floor(Math.random()*99) }, 0);
   area.appendChild(el);
   area.scrollTop = area.scrollHeight;
+  scheduleDisappearCheck(); // jadwalkan pesan baru ini agar ikut menghilang
 });
 
 // Copy CSS
